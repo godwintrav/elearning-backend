@@ -26,7 +26,8 @@ app.use("/api/student", studentRoute);
 //database connection
 mongoose.connect(process.env.DB_CONNECTION, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex:true })
     .then((result) => {
-        var server = app.listen(process.env.PORT);
+        var PORT = process.env.PORT || 3000;
+        var server = app.listen(PORT);
         // server.timeout = 1800000; 
         console.log("DB Connected");
     })
