@@ -4,8 +4,7 @@
   "description": "An E-learning platform by FMR Agency",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js",
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "keywords": [
     "E-learning",
