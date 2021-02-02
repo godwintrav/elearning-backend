@@ -2,7 +2,7 @@
   "name": "elearning",
   "version": "1.0.0",
   "description": "An E-learning platform by FMR Agency",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
@@ -25,5 +25,8 @@
     "uniqid": "^5.2.0",
     "validator": "^13.5.2",
     "vimeo": "^2.1.1"
+  },
+  "engines": {
+    "node": "v12.6.0"
   }
 }
