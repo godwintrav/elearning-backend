@@ -2,7 +2,7 @@
 
 //handle errors
 module.exports.handleAuthErrors = (err) => {
-    console.log(err.message, err.code);
+    //console.log(err.message, err.code);
     let errors = {firstName: '', lastName: '', email: '', password: '', address: '', phone: '', instructorType: '', userType: '', course: '', degree: '', trainingLicence: '', incorporationCertificate: '', companyName: ''};
 
     //unverified email
@@ -74,7 +74,7 @@ module.exports.handleAuthErrors = (err) => {
     //validation errors
     if(err.message.includes('user validation failed')) {
         Object.values(err.errors).forEach(({ properties }) => {
-            console.log(properties);
+            //console.log(properties);
             errors[properties.path] = properties.message;
         });
     }
@@ -83,13 +83,28 @@ module.exports.handleAuthErrors = (err) => {
 }
 
 module.exports.handleCourseErrors = (err) => {
-    console.log(err.message, err.code);
-    let errors = {user: '', title: '', whatYouLearn: '', requirement: '', description: '', secondTitle: ''};
+    //console.log(err.message, err.code);
+    let errors = {user: '', title: '', whatYouLearn: '', requirement: '', description: '', secondTitle: '', thumbnail: '', category: ''};
 
     //validation errors
-    if(err.message.includes('user validation failed')){
+    if(err.message.includes('course validation failed')){
         Object.values(err.errors).forEach(({properties}) => {
-            console.log(properties);
+            //console.log(properties);
+            errors[properties.path] = properties.message;
+        });
+    }
+
+    return errors;
+}
+
+module.exports.handlePlaylistErrors = (err) => {
+    //console.log(err.message, err.code);
+    let errors = {course: '', name: ''};
+
+    //validation errors
+    if(err.message.includes('playlist validation failed')){
+        Object.values(err.errors).forEach(({properties}) => {
+            //console.log(properties);
             errors[properties.path] = properties.message;
         });
     }
@@ -142,12 +157,8 @@ module.exports.checkCorporateErrors = (request) => {
 }
 
 module.exports.checkLectureErrors = (request) => {
-    if(!request.body.courseId){
-        throw Error('required courseID');
-    }
-
-    if(!request.body.description){
-        throw Error('required description');
+    if(!request.body.playlistId){
+        throw Error('required playlistID');
     }
 
     if(!request.body.title){
@@ -160,16 +171,11 @@ module.exports.checkLectureErrors = (request) => {
 }
 
 module.exports.handleCreateLectureErrors = (err) => {
-    console.log(err.message);
-    let errors = {course: '', description: '', title: '', video: ''};
-    //required courseID
-    if(err.message === 'required courseID'){
-        errors.course = "courseID is required";
-    }
-
-    //required description
-    if(err.message === 'required description'){
-        errors.description = "Description is required";
+    //console.log(err.message);
+    let errors = {playlist: '', description: '', title: '', video: ''};
+    //required playlistID
+    if(err.message === 'required playlistID'){
+        errors.playlist = "playlistID is required";
     }
 
     //required title

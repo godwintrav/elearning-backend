@@ -8,19 +8,20 @@ const cookieParser = require('cookie-parser');
 const authMiddleware = require('./middleware/authMiddleware');
 const instructorRoute = require('./routes/instructorRoute');
 const studentRoute = require('./routes/studentRoute');
+const publicRoute = require('./routes/publicRoute');
 
 
 
 //middlewares
 app.use(express.json());
 app.use(cookieParser());
-
-
+//authMiddleware.authorize("admin")
 //routes
 app.use("/api/auth",authRoutes);
-app.use("/api/admin" , authMiddleware.authorize("admin"),adminRoutes);
+app.use("/api/admin", authMiddleware.authorize("admin") ,adminRoutes);
 app.use("/api/instructor", instructorRoute);
 app.use("/api/student", studentRoute);
+app.use("/api/public", publicRoute);
 
 
 //database connection

@@ -14,6 +14,7 @@ router.get("/verify/:id", adminController.verifyCorporateInstructor);
 router.get("/instructor/certificate/:id", adminController.viewCertificate);
 router.get("/instructor/licence/:id", adminController.viewLicence);
 router.post("/category", adminController.addCategory);
+router.get("/categories", adminController.fetchCategories);
 router.post("/register", adminController.registerAdmin);
 
 

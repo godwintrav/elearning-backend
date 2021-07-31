@@ -4,8 +4,8 @@ const Instructor = require('../models/Instructor');
 const jwt = require('jsonwebtoken');
 const cryptoRandomString = require('crypto-random-string');
 const errorController = require('./errorController');
-const nodemailer = require('nodemailer');
-console.log(process.env.SECRET_CODE);
+const emailController = require('./emailController');
+//console.log(process.env.SECRET_CODE);
 // maximum time for jwt
 const maxAge = 3 * 24 * 60 * 60;
 
@@ -23,7 +23,7 @@ module.exports.student_signup_post = async (req, res) => {
     const verifyId = cryptoRandomString({length: 30});
     let token_name = '';
     let user = null;
-    console.log(req.body);
+    //console.log(req.body);
 
     try{
 
@@ -53,14 +53,13 @@ module.exports.student_signup_post = async (req, res) => {
 }
 
 module.exports.instructor_signup_post = async (req, res) => {
-    const {firstName, lastName, email, password, userType, address, phone} = req.body;
+    const {firstName, lastName, email, password, userType, address, phone, instructorType} = req.body;
     const verifyId = cryptoRandomString({length: 30});
     let token_name = '';
     let user = null;
-    console.log("this is body", req.files);
+    //console.log("this is body", req.files);
 
     token_name = 'instructor_token';
-    const { instructorType } = req.body;
 
         try{
 
@@ -142,7 +141,7 @@ module.exports.login_post = async (req, res) => {
         }
         //remember to add secure when in production
         res.cookie(token_name, token, { httpOnly: true, maxAge: maxAge * 1000});
-        res.status(200).json({ token: token, type: user.userType });
+        res.status(200).json({ token: token, type: user.userType, email: user.email });
     }catch(err){
         const errors = errorController.handleAuthErrors(err);
         res.status(400).json({ errors });
@@ -152,7 +151,7 @@ module.exports.login_post = async (req, res) => {
 module.exports.pdf = async (req, res) => {
     const id = req.params.id;
     const instructor = await Instructor.findOne({ user: id});
-        console.log(instructor);
+        //console.log(instructor);
         var b64string = instructor.incorporationCertificate.get('data');
         var buf = Buffer.from(b64string, 'base64');
         res.writeHead(200, { "Content-type": instructor.incorporationCertificate.get('mimetype')});
@@ -200,41 +199,13 @@ module.exports.resendVerificationLink = async (req, res) => {
         if(!user){
             res.status(404).json({ errors: "User not Found"});
         }
-        console.log(user);
-        let link = process.env.BASE_URL + "api/auth/" + user.verifyId;
-        let testAccount = await nodemailer.createTestAccount();
-
-        let transporter = nodemailer.createTransport({
-            host: "smtp.ethereal.email",
-            port: 587,
-            requireTLS: true,
-            secure: false, // true for 465, false for other ports
-            auth: {
-            user: testAccount.user, // generated ethereal user
-            pass: testAccount.pass, // generated ethereal password
-            },
-        });
-
-        // send mail with defined transport object
-        let info = await transporter.sendMail({
-            from: '"FMR E-Learning 👻" <frme-learning@example.com>', // sender address
-            to: email, // list of receivers
-            subject: "Verify Email Address ✔", // Subject line
-            text: "Verify Email Address click the link " + link, // plain text body
-            html: '<body style="background-color: lightblue;"><h1 style="text-align: center;">Verify Email Address</h1><p style="text-align: center;">Please click on the button below to verify email address <a href="' + link + '"><button>Verify Email</button></a></p></body>', // html body
-        });
-
-        console.log("Message sent: %s", info.messageId);
-        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-        // Preview only available when sending through an Ethereal account
-        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
+        //console.log(user);
+        let link = process.env.BASE_URL + "api/auth/" + user.verifyId;   
+        const result = await emailController.sendVerificationEmail(link, user.email, user.firstName);
         res.json({ message: "Verification link sent to email address"});
 
     }catch(err){
-        console.log(err);
+        //console.log(err);
         res.status(500).json({ errors: "Error sending verification Link"});
     }
     

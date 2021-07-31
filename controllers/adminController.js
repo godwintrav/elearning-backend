@@ -106,7 +106,7 @@ module.exports.fetchStudent = async (req, res) => {
 module.exports.viewCertificate = async (req, res) => {
     const id = req.params.id;
     const instructor = await Instructor.findById(id);
-        console.log(instructor);
+        //console.log(instructor);
         var b64string = instructor.incorporationCertificate.get('data');
         var buf = Buffer.from(b64string, 'base64');
         res.writeHead(200, { "Content-type": instructor.incorporationCertificate.get('mimetype')});
@@ -116,17 +116,27 @@ module.exports.viewCertificate = async (req, res) => {
 module.exports.viewLicence = async (req, res) => {
     const id = req.params.id;
     const instructor = await Instructor.findById(id);
-        console.log(instructor);
+        //console.log(instructor);
         var b64string = instructor.trainingLicence.get('data');
         var buf = Buffer.from(b64string, 'base64');
         res.writeHead(200, { "Content-type": instructor.trainingLicence.get('mimetype')});
         res.end(buf);
 }
 
+module.exports.viewCV = async (req, res) => {
+    const id = req.params.id;
+    const instructor = await Instructor.findById(id);
+        //console.log(instructor);
+        var b64string = instructor.cv.get('data');
+        var buf = Buffer.from(b64string, 'base64');
+        res.writeHead(200, { "Content-type": instructor.cv.get('mimetype')});
+        res.end(buf);
+}
+
 module.exports.addCategory = async (req, res) => {
     const {category} = req.body;
     try{
-        const newCategory = await Category.create({ category });
+        const newCategory = await Category.create({ name: category });
         res.status(201).json({ message: "Category Added Successfully" });
     }catch(errors){
         res.status(500).json({ error: "Error adding caregory" });
@@ -135,8 +145,10 @@ module.exports.addCategory = async (req, res) => {
 
 module.exports.fetchCategories = async (req, res) => {
     try{
-        const categories = await Category.find().sort({ createdAt: -1 });
+        const categories = await Category.find({}).sort({ createdAt: -1 });
+        res.json(categories);
     }catch(errors){
+        console.log(errors);
         res.status(404).json({ errors: errors.message });
     }
 }
@@ -159,6 +171,17 @@ module.exports.deleteCategory = async (req, res) => {
     try{
         const deletedCategory = await Category.findByIdAndDelete(categoryId);
         res.json(deletedCategory);
+    }catch(errors){
+        res.status(404).json({ errors: errors.message });
+    }
+}
+
+module.exports.deleteCourse = async (req, res) => {
+    const { courseId } = req.body;
+
+    try{
+        const deletedCourse = await Course.findByIdAndDelete(courseId);
+        res.json(deletedCourse);
     }catch(errors){
         res.status(404).json({ errors: errors.message });
     }

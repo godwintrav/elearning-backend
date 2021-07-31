@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 mongoose.set('useFindAndModify', false);
 const { isEmail } = require('validator');
 const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
+const emailController = require('../controllers/emailController');
+
 
 const userSchema = new mongoose.Schema({
     firstName:{
@@ -63,38 +64,9 @@ userSchema.pre('save', async function(next){
 
 //send email after doc is saved
 userSchema.post('save', async function(doc, next){
-
-    try{
+    try{    
         let link = process.env.BASE_URL + "api/auth/" + doc.verifyId;
-        let testAccount = await nodemailer.createTestAccount();
-
-        let transporter = nodemailer.createTransport({
-            host: "smtp.ethereal.email",
-            port: 587,
-            requireTLS: true,
-            secure: false, // true for 465, false for other ports
-            auth: {
-            user: testAccount.user, // generated ethereal user
-            pass: testAccount.pass, // generated ethereal password
-            },
-        });
-
-        // send mail with defined transport object
-        let info = await transporter.sendMail({
-            from: '"FMR E-Learning 👻" <frme-learning@example.com>', // sender address
-            to: doc.email, // list of receivers
-            subject: "Verify Email Address ✔", // Subject line
-            text: "Verify Email Address click the link " + link, // plain text body
-            html: '<body style="background-color: lightblue;"><h1 style="text-align: center;">Verify Email Address</h1><p style="text-align: center;">Please click on the button below to verify email address <a href="' + link + '"><button>Verify Email</button></a></p></body>', // html body
-        });
-
-        console.log("Message sent: %s", info.messageId);
-        // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-        // Preview only available when sending through an Ethereal account
-        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-        // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
+        const result = await emailController.sendVerificationEmail(link, doc.email, doc.firstName);
         next();
 
     }catch(err){
